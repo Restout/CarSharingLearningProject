@@ -1,9 +1,7 @@
 package com.example.carsharingservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -23,5 +21,6 @@ public class Driver {
     private int drivingExperience;
     private Date birthDate;
     @Size(min=11,max=11)
+    @Positive
     private long passport;
 }
