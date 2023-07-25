@@ -5,6 +5,8 @@ import com.example.carsharingservice.repositories.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class CarService {
     @Autowired
@@ -13,5 +15,11 @@ public class CarService {
     public Iterable<Car> getCarsList(int numberOfPage, int sizeOfPage) {
         numberOfPage -= 1;
         return carRepository.getPagedListOfCars(numberOfPage, sizeOfPage);
+    }
+    public Optional<Car> getCarById(int id){
+        return carRepository.getCarById(id);
+    }
+    public boolean deleteCarById(int id){
+        return carRepository.deleteCarById(id);
     }
 }
