@@ -2,6 +2,7 @@ package com.example.carsharingservice.repositories;
 
 import com.example.carsharingservice.model.Car;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +26,7 @@ public class CarRepository {
                 .append(sizeOfPage * (numberOfPage + 1));
         return namedParameterJdbcTemplate.query(query.toString(), (rs, rowNum) -> Car.builder()
                 .id(rs.getInt("id"))
-                .manufactureYear(rs.getInt("manufacture_year"))
+                .manufactureYear(rs.getInt("manufacturing_year"))
                 .brand(rs.getString("brand"))
                 .mileAge(rs.getInt("mileage")).build());
     }
@@ -34,14 +35,14 @@ public class CarRepository {
         StringBuilder query = new StringBuilder();
         query.append("SELECT * ")
                 .append("FROM car ")
-                .append("WHERE id LIKE '")
+                .append("WHERE id = '")
                 .append(id)
                 .append("'");
         return Optional.ofNullable(namedParameterJdbcTemplate.query(query.toString(), (rs, num) -> Car.builder()
                 .id(rs.getInt("id"))
                 .brand(rs.getString("brand"))
                 .mileAge(rs.getInt("mileage"))
-                .manufactureYear(rs.getInt("manufacture_year"))
+                .manufactureYear(rs.getInt("manufacturing_year"))
                 .build()).get(0));
     }
 
