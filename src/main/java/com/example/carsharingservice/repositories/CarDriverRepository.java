@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Qualifier("carDriverRepository")
 @Repository
@@ -33,7 +30,7 @@ public class CarDriverRepository {
                 .mileAge(rs.getInt("mileage")).build());
     }
 
-    public Optional<RentedCar> getRentCarById(int driverId, int carId) {
+    public Optional<RentedCar> getRentCarById(String driverId, int carId) {
         StringBuilder query = new StringBuilder();
         query.append("SELECT * ")
                 .append("FROM car_driver ")
@@ -66,8 +63,19 @@ public class CarDriverRepository {
         paramMap.put("car_id", carId);
         return namedParameterJdbcTemplate.update(query.toString(), paramMap) == 1;
     }
-/*public boolean insertNewCarForDriver(int driverId,int carId){
-        StringBuilder query=new StringBuilder();
-        return false;
-}*/
+
+    public boolean insertNewCarForDriver(String driverId, int carId) {
+        Date currentDate = new Date();
+        HashMap<String, Object> rentParamsMap = new HashMap<>();
+        rentParamsMap.put("carId", carId);
+        rentParamsMap.put("driverId", driverId);
+        rentParamsMap.put("id", carId+driverId);
+        rentParamsMap.put("startTime", currentDate.getTime());
+        StringBuilder query = new StringBuilder();
+        query.append("INSERT INTO car_driver ")
+                .append("(car_id,driver_id,id,rent_start_time) ")
+                .append("values ")
+                .append("(:carId,:driverId,:id,:startTime) ");
+        return namedParameterJdbcTemplate.update(query.toString(), rentParamsMap) == 1;
+    }
 }

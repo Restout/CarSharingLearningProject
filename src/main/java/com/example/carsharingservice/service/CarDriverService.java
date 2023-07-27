@@ -23,11 +23,11 @@ public class CarDriverService {
 
     }
 
-    public Optional<RentedCar> getRentCarById(int driverId, int carId) {
+    public Optional<RentedCar> getRentCarById(String driverId, int carId) {
         return carDriverRepository.getRentCarById(driverId, carId);
     }
 
-    public BigDecimal getChargeForRentTime(int driverId, int carId) throws Exception {
+    public BigDecimal getChargeForRentTime(String driverId, int carId) throws Exception {
         Date curentDate = new Date();
         Optional<RentedCar> deletedCar = carDriverRepository.getRentCarById(driverId, carId);
         if (deletedCar.isEmpty()) {
@@ -36,7 +36,7 @@ public class CarDriverService {
         carDriverRepository.deleteRentCarById(carId);
         return BigDecimal.valueOf(Math.abs(curentDate.getTime() - deletedCar.get().getTime()) * chargeMultiplier);
     }
-   /* public boolean rentAvailableCar(int driverId,int carId){
+    public boolean rentAvailableCar(String driverId,int carId){
         return carDriverRepository.insertNewCarForDriver(driverId,carId);
-    }*/
+    }
 }

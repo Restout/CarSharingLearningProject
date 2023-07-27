@@ -51,7 +51,7 @@ public class DriverController {
     }
 
     @GetMapping("/carsharing/profile/yourCars/car")
-    public ResponseEntity<RentedCar> getDriverRentCarByCarId(@RequestParam int driverId, @RequestParam int carId) {
+    public ResponseEntity<RentedCar> getDriverRentCarByCarId(@RequestParam String driverId, @RequestParam int carId) {
         Optional<RentedCar> result = carDriverService.getRentCarById(driverId, carId);
         if (result.isEmpty()) {
             return ResponseEntity
@@ -64,7 +64,7 @@ public class DriverController {
     }
 
     @DeleteMapping("/carsharing/profile/yourCars/car")
-    public ResponseEntity<BigDecimal> deleteDriverRentCarById(@RequestParam int driverId, @RequestParam int carId) {
+    public ResponseEntity<BigDecimal> deleteDriverRentCarById(@RequestParam String driverId, @RequestParam int carId) {
         BigDecimal result;
         try {
             result = carDriverService.getChargeForRentTime(driverId, carId);
@@ -77,11 +77,18 @@ public class DriverController {
                 .ok()
                 .body(result.setScale(2, RoundingMode.HALF_EVEN));
     }
-   /* @PostMapping("/carsharing/profile/yourCars/car")
-    public ResponseEntity<Boolean> rentAvailableCar(@RequestParam int driverId,@RequestParam int carId){
+
+    @PostMapping("/carsharing/profile/yourCars/car")
+    public ResponseEntity<Boolean> rentAvailableCar(@RequestParam String driverId, @RequestParam int carId) {
+        boolean result = carDriverService.rentAvailableCar(driverId, carId);
+        if (!result) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
         return ResponseEntity
                 .ok()
-                .body(carDriverService.rentAvailableCar(driverId,carId));
-    }*/
+                .body(result);
+    }
 }
 
