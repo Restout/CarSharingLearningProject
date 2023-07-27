@@ -55,4 +55,18 @@ public class CarRepository {
         paramMap.put("id", id);
         return namedParameterJdbcTemplate.update(query.toString(), paramMap) == 1;
     }
+
+    public boolean addNewCar(Car car) {
+        StringBuilder query = new StringBuilder();
+        HashMap<String, Object> carParams = new HashMap<>();
+        carParams.put("id", car.getId());
+        carParams.put("brand", car.getBrand());
+        carParams.put("manufacturingYear", car.getManufactureYear());
+        carParams.put("mileage", car.getMileAge());
+        query.append("INSERT INTO car ")
+                .append("(id,brand,manufacturing_year,mileage) ")
+                .append("values ")
+                .append("(:id,:brand,:manufacturingYear,:mileage) ");
+        return namedParameterJdbcTemplate.update(query.toString(), carParams) == 1;
+    }
 }

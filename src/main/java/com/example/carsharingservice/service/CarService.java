@@ -16,10 +16,16 @@ public class CarService {
         numberOfPage -= 1;
         return carRepository.getPagedListOfCars(numberOfPage, sizeOfPage);
     }
-    public Optional<Car> getCarById(int id){
+
+    public Optional<Car> getCarById(int id) {
         return carRepository.getCarById(id);
     }
-    public boolean deleteCarById(int id){
+
+    public boolean deleteCarById(int id) {
         return carRepository.deleteCarById(id);
+    }
+
+    public boolean addNewCar(Car car) {
+        return carRepository.addNewCar(car);
     }
 }
