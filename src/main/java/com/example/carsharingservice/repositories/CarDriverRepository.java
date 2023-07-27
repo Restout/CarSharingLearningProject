@@ -1,28 +1,73 @@
 package com.example.carsharingservice.repositories;
 
 import com.example.carsharingservice.model.Car;
+import com.example.carsharingservice.model.RentedCar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 @Qualifier("carDriverRepository")
 @Repository
 public class CarDriverRepository {
     @Autowired
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public Iterable<Car> getCarsByDriverId(int id) {
+    public Iterable<Car> getCarsByDriverId(int driverId) {
         StringBuilder query = new StringBuilder();
         query.append("SELECT * ")
                 .append("FROM car_driver ")
                 .append("JOIN car ")
                 .append("ON car.id=car_driver.car_id ")
                 .append("WHERE driver_id = ")
-                .append(id);
-         return  namedParameterJdbcTemplate.query(query.toString(), (rs, rowNum) -> Car.builder()
+                .append(driverId);
+        return namedParameterJdbcTemplate.query(query.toString(), (rs, rowNum) -> Car.builder()
                 .id(rs.getInt("car_id"))
                 .brand(rs.getString("brand"))
                 .manufactureYear(rs.getInt("manufacturing_year"))
                 .mileAge(rs.getInt("mileage")).build());
     }
+
+    public Optional<RentedCar> getRentCarById(int driverId, int carId) {
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT * ")
+                .append("FROM car_driver ")
+                .append("JOIN car ")
+                .append("ON car.id=car_id ")
+                .append("WHERE car_id =")
+                .append(carId)
+                .append(" AND driver_id = ")
+                .append(driverId);
+        List<RentedCar> result = namedParameterJdbcTemplate.query(query.toString(), (rs, rowNum) -> RentedCar.builder()
+                .time(rs.getLong("rent_start_time"))
+                .driverId(rs.getString("driver_id"))
+                .brand(rs.getString("brand"))
+                .manufactureYear(rs.getInt("manufacturing_year"))
+                .id(rs.getInt("car_id"))
+                .build());
+        if (result.size() == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(result.get(0));
+    }
+
+    public boolean deleteRentCarById(int carId) {
+        StringBuilder query = new StringBuilder();
+        query.append("DELETE ")
+                .append("FROM car_driver ")
+                .append("WHERE car_id = ")
+                .append(carId);
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("car_id", carId);
+        return namedParameterJdbcTemplate.update(query.toString(), paramMap) == 1;
+    }
+/*public boolean insertNewCarForDriver(int driverId,int carId){
+        StringBuilder query=new StringBuilder();
+        return false;
+}*/
 }

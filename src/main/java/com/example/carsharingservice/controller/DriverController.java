@@ -2,16 +2,17 @@ package com.example.carsharingservice.controller;
 
 import com.example.carsharingservice.model.Car;
 import com.example.carsharingservice.model.Driver;
+import com.example.carsharingservice.model.RentedCar;
 import com.example.carsharingservice.service.CarDriverService;
 import com.example.carsharingservice.service.DriverService;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 
 @RestController
@@ -24,7 +25,7 @@ public class DriverController {
     CarDriverService carDriverService;
 
     @GetMapping("/carsharing/profile/user")
-    public ResponseEntity<Driver> getDriverDataById(@RequestParam @Pattern(regexp = "/^[0-9]*$/") String id) {
+    public ResponseEntity<Driver> getDriverDataById(@RequestParam @Pattern(regexp = "^[0-9]*$") String id) {
         Optional<Driver> driver = driverService.getDriverById(id);
         if (driver.isEmpty()) {
             return ResponseEntity
@@ -37,8 +38,8 @@ public class DriverController {
     }
 
     @GetMapping("/carsharing/profile/yourCars")
-    public ResponseEntity<Iterable<Car>> getCarsByDriverId(@RequestParam int id) {
-        Iterable<Car> carsByDriverId = carDriverService.getCarsByDriverId(id);
+    public ResponseEntity<Iterable<Car>> getCarsByDriverId(@RequestParam int driverId) {
+        Iterable<Car> carsByDriverId = carDriverService.getCarsByDriverId(driverId);
         if (carsByDriverId == null) {
             ResponseEntity
                     .badRequest()
@@ -49,5 +50,38 @@ public class DriverController {
                 .body(carsByDriverId);
     }
 
+    @GetMapping("/carsharing/profile/yourCars/car")
+    public ResponseEntity<RentedCar> getDriverRentCarByCarId(@RequestParam int driverId, @RequestParam int carId) {
+        Optional<RentedCar> result = carDriverService.getRentCarById(driverId, carId);
+        if (result.isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+        return ResponseEntity
+                .ok()
+                .body(result.get());
+    }
+
+    @DeleteMapping("/carsharing/profile/yourCars/car")
+    public ResponseEntity<BigDecimal> deleteDriverRentCarById(@RequestParam int driverId, @RequestParam int carId) {
+        BigDecimal result;
+        try {
+            result = carDriverService.getChargeForRentTime(driverId, carId);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+        return ResponseEntity
+                .ok()
+                .body(result.setScale(2, RoundingMode.HALF_EVEN));
+    }
+   /* @PostMapping("/carsharing/profile/yourCars/car")
+    public ResponseEntity<Boolean> rentAvailableCar(@RequestParam int driverId,@RequestParam int carId){
+        return ResponseEntity
+                .ok()
+                .body(carDriverService.rentAvailableCar(driverId,carId));
+    }*/
 }
 
