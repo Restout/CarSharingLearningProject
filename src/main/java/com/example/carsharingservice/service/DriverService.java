@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.Optional;
 @Qualifier("driverService")
 @Service
@@ -14,6 +15,10 @@ public class DriverService {
     private DriverRepository driverRepository;
 
     public Optional<Driver> getDriverById(String id) {
-        return driverRepository.getDriverById(id);
+        try {
+            return driverRepository.getDriverById(id);
+        } catch (SQLException exception) {
+            return Optional.empty();
+        }
     }
 }

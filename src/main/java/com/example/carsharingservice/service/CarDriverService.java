@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Optional;
 
@@ -16,7 +17,7 @@ import java.util.Optional;
 public class CarDriverService {
     @Autowired
     CarDriverRepository carDriverRepository;
-    private final double chargeMultiplier = 0.0015d;
+    private final double chargeMultiplier = 0.00015d;
 
     public Iterable<Car> getCarsByDriverId(int id) {
         return carDriverRepository.getCarsByDriverId(id);
@@ -24,7 +25,11 @@ public class CarDriverService {
     }
 
     public Optional<RentedCar> getRentCarById(String driverId, int carId) {
-        return carDriverRepository.getRentCarById(driverId, carId);
+        try {
+            return carDriverRepository.getRentCarById(driverId, carId);
+        } catch (SQLException sqlException) {
+            return Optional.empty();
+        }
     }
 
     public BigDecimal getChargeForRentTime(String driverId, int carId) throws Exception {

@@ -5,6 +5,7 @@ import com.example.carsharingservice.repositories.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
 @Service
@@ -18,7 +19,11 @@ public class CarService {
     }
 
     public Optional<Car> getCarById(int id) {
-        return carRepository.getCarById(id);
+        try {
+            return carRepository.getCarById(id);
+        } catch (SQLException sqlException) {
+            return Optional.empty();
+        }
     }
 
     public boolean deleteCarById(int id) {

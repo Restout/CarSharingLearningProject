@@ -23,7 +23,7 @@ public class DriverController {
     @Qualifier("carDriverService")
     @Autowired
     CarDriverService carDriverService;
-
+//reges dont work why??
     @GetMapping("/carsharing/profile/user")
     public ResponseEntity<Driver> getDriverDataById(@RequestParam @Pattern(regexp = "^[0-9]*$") String id) {
         Optional<Driver> driver = driverService.getDriverById(id);
@@ -55,7 +55,7 @@ public class DriverController {
         Optional<RentedCar> result = carDriverService.getRentCarById(driverId, carId);
         if (result.isEmpty()) {
             return ResponseEntity
-                    .badRequest()
+                    .status(204)
                     .build();
         }
         return ResponseEntity

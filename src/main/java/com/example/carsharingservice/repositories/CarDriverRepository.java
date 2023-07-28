@@ -7,7 +7,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Qualifier("carDriverRepository")
 @Repository
@@ -30,7 +34,7 @@ public class CarDriverRepository {
                 .mileAge(rs.getInt("mileage")).build());
     }
 
-    public Optional<RentedCar> getRentCarById(String driverId, int carId) {
+    public Optional<RentedCar> getRentCarById(String driverId, int carId) throws SQLException {
         StringBuilder query = new StringBuilder();
         query.append("SELECT * ")
                 .append("FROM car_driver ")
@@ -40,17 +44,17 @@ public class CarDriverRepository {
                 .append(carId)
                 .append(" AND driver_id = ")
                 .append(driverId);
-        List<RentedCar> result = namedParameterJdbcTemplate.query(query.toString(), (rs, rowNum) -> RentedCar.builder()
-                .time(rs.getLong("rent_start_time"))
-                .driverId(rs.getString("driver_id"))
-                .brand(rs.getString("brand"))
-                .manufactureYear(rs.getInt("manufacturing_year"))
-                .id(rs.getInt("car_id"))
-                .build());
-        if (result.size() == 0) {
-            return Optional.empty();
+        try {
+            return Optional.of(namedParameterJdbcTemplate.query(query.toString(), (rs, rowNum) -> RentedCar.builder()
+                    .time(rs.getLong("rent_start_time"))
+                    .driverId(rs.getString("driver_id"))
+                    .brand(rs.getString("brand"))
+                    .manufactureYear(rs.getInt("manufacturing_year"))
+                    .id(rs.getInt("car_id"))
+                    .build()).get(0));
+        } catch (IndexOutOfBoundsException exception) {
+            throw new SQLException("No such Element");
         }
-        return Optional.of(result.get(0));
     }
 
     public boolean deleteRentCarById(int carId) {

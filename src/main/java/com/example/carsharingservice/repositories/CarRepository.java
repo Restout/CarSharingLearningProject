@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -30,19 +31,24 @@ public class CarRepository {
                 .mileAge(rs.getInt("mileage")).build());
     }
 
-    public Optional<Car> getCarById(int id) {
+    public Optional<Car> getCarById(int id) throws SQLException {
         StringBuilder query = new StringBuilder();
         query.append("SELECT * ")
                 .append("FROM car ")
                 .append("WHERE id = '")
                 .append(id)
                 .append("'");
-        return Optional.ofNullable(namedParameterJdbcTemplate.query(query.toString(), (rs, num) -> Car.builder()
-                .id(rs.getInt("id"))
-                .brand(rs.getString("brand"))
-                .mileAge(rs.getInt("mileage"))
-                .manufactureYear(rs.getInt("manufacturing_year"))
-                .build()).get(0));
+
+        try {
+            return Optional.ofNullable(namedParameterJdbcTemplate.query(query.toString(), (rs, num) -> Car.builder()
+                    .id(rs.getInt("id"))
+                    .brand(rs.getString("brand"))
+                    .mileAge(rs.getInt("mileage"))
+                    .manufactureYear(rs.getInt("manufacturing_year"))
+                    .build()).get(0));
+        } catch (IndexOutOfBoundsException exception) {
+            throw new SQLException("No Such elements In database");
+        }
     }
 
     public boolean deleteCarById(int id) {
