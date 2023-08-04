@@ -19,7 +19,7 @@ public class CarDriverService {
     CarDriverRepository carDriverRepository;
     private final double chargeMultiplier = 0.00015d;
 
-    public Iterable<Car> getCarsByDriverId(int id) {
+    public Iterable<Car> getCarsByDriverId(String id) {
         return carDriverRepository.getCarsByDriverId(id);
 
     }

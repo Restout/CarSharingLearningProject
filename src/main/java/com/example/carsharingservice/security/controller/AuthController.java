@@ -26,7 +26,7 @@ public class AuthController {
 
     @PostMapping("/carsharing/auth/login")
     public ResponseEntity<String> authentication(@RequestBody UserPassword user, HttpServletResponse response) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), String.valueOf(user.getPassword())));
         final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         String jwtToken = "Bearer " + jwtUtils.generateToken(userDetails);
         response.addHeader(HttpHeaders.AUTHORIZATION, jwtToken);

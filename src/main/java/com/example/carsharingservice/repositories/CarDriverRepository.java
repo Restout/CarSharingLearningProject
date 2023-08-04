@@ -19,13 +19,13 @@ public class CarDriverRepository {
     @Autowired
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public Iterable<Car> getCarsByDriverId(int driverId) {
+    public Iterable<Car> getCarsByDriverId(String driverId) {
         StringBuilder query = new StringBuilder();
         query.append("SELECT * ")
                 .append("FROM car_driver ")
                 .append("JOIN car ")
                 .append("ON car.id=car_driver.car_id ")
-                .append("WHERE driver_id = ")
+                .append("WHERE driver_id LIKE ")
                 .append(driverId);
         return namedParameterJdbcTemplate.query(query.toString(), (rs, rowNum) -> Car.builder()
                 .id(rs.getInt("car_id"))

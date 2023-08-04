@@ -1,6 +1,6 @@
 package com.example.carsharingservice.security;
 
-import com.example.carsharingservice.security.dao.UserDao;
+import com.example.carsharingservice.security.Repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,11 +15,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
-    private final UserDao userDao;
+    private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
 
     @Override
@@ -35,10 +36,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         jwtToken = header.substring(7);
         userId = jwtUtils.extractUsername(jwtToken);
         if (!userId.isBlank() && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDao.findUserByUsername(userId);
-            if (jwtUtils.validateToken(jwtToken, userDetails)) {
+            Optional<UserDetails> userDetails = userRepository.getUserByUserName(userId);
+            if (userDetails.isPresent() && jwtUtils.validateToken(jwtToken, userDetails.get())) {
                 UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.get().getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
